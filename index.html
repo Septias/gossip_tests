@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Gossip Testing </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <script src="webxdc.js"></script>
+    <style type="text/css">
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <h1> Gossip Testing </h1>
+    <div>
+        <label> Message </label>
+        <input id="message" placeholder="message" value="hi" alt="Gossip channel" style="margin-bottom: 1em"></input>
+        <br>
+        <label> Send Gossip Message </label>
+        <input id="create_gossip" placeholder="Gossip channel" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"></input>
+        <input type="submit" onclick="sendGossip()" value="Send" />
+        <br>
+        <label> Send Message </label>
+        <input type="submit" onclick="sendMsg()" value="Send" style="margin-bottom: 1em" />
+        <br>
+        <label> Join Gossip Channel </label>
+        <input id="join_gossip" alt="Gossip channel" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"></input>
+        <input type="submit" onclick="joinTopic()" />
+    </div>
+
+
+    <p id="output"></p>
+    <script>
+
+        var El = function (tag, text) {
+            var el = document.createElement(tag);
+            el.innerText = text || '';
+            return el;
+        };
+
+        // handle past and future state updates
+        window.webxdc.setUpdateListener(function (update) {
+            var output = document.getElementById('output');
+            // when appending content to an element with output.innerHTML +=
+            // that content is implicitly parsed, making it possible for messages
+            // to be interpreted as scripts. Creating elements directly,
+            // injecting content as plain text, and appending them to the DOM
+            // is a much safer practice.
+            if (update.gossip_topic) {
+                output.appendChild(El('strong', `${update.gossip_topic}: `));
+                output.appendChild(El('span', update.payload.msg));
+                output.appendChild(El('br'));
+            } else {
+                output.appendChild(El('span', update.payload.msg));
+                output.appendChild(El('br'));
+            }
+        });
+
+        function joinTopic() {
+
+            let gossip_topic = document.getElementById('join_gossip').value;
+            if (gossip_topic.length !== 32) {
+                throw new Error('Invalid gossip topic of length ' + gossip_topic.length);
+            }
+            window.webxdc.joinGossipTopic(gossip_topic);
+        }
+
+        function sendGossip() {
+            let gossip_topic = document.getElementById('create_gossip').value;
+            if (gossip_topic.length !== 32) {
+                throw new Error('Invalid gossip topic of length ' + gossip_topic.length);
+            }
+            let msg = document.getElementById('message').value;
+            window.webxdc.sendUpdate({
+                payload: {
+                    name: window.webxdc.selfName,
+                    msg,
+                },
+                gossip_topic,
+            }, "");
+        }
+
+        function sendMsg() {
+            let msg = document.getElementById('message').value;
+            window.webxdc.sendUpdate({
+                payload: {
+                    name: window.webxdc.selfName,
+                    msg,
+                },
+            }, "");
+        }
+    </script>
+</body>
+
+</html>
