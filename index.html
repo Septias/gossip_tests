@@ -49,6 +49,10 @@
             padding: 8px 4px;
         }
 
+        input::placeholder {
+            color:#ddbdbb;
+        }
+
         #output {
             display: flex;
             flex-direction: column;
@@ -65,6 +69,12 @@
             padding: 8px 4px;
             color: #0D1821;
             cursor: pointer;
+            font: bold;
+        }
+
+        button:disabled {
+            background: #BEA8A7;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -75,9 +85,10 @@
     <h1> Gossip Testing </h1>
     <div class="wrapper">
         <div class="ui">
-            <label> Message </label>
+            <label style="margin-bottom: 2px"> Message </label>
             <input id="message" placeholder="message" style="margin-bottom: 1em"></input>
-            <button onclick="sendGossip()" style="margin-bottom: 0.5em"> Send GOSSIP </button>
+            <button id="sendGossip" onclick="sendGossip()" style="margin-bottom: 0.5em" disabled="true"> Send GOSSIP
+            </button>
             <button onclick="sendMsg()" style="margin-bottom: 0.5em"> Send SMTP </button>
 
             <h1> Output </h1>
@@ -94,31 +105,30 @@
             return el;
         };
 
-        // handle past and future state updates
         window.webxdc.setUpdateListener(function (update) {
-            console.log("Gossip: ", update.payload);
-
+            console.log("Received SMTP: ", update.payload);
             var output = document.getElementById('output');
             output.appendChild(El('span', "SMTP(" + window.webxdc.selfAddr + "): " + update.payload.msg));
         });
 
-        // handle past and future state updates
+        let sendGossip = () => { console.log("not ready") }
+
         window.webxdc.setEphemeralUpdateListener(function (update) {
-            console.log("Gossip: ", update);
+            console.log("Received Gossip: ", update);
             var output = document.getElementById('output');
             output.appendChild(El('span', "GOSSIP(" + window.webxdc.selfAddr + "): " + update));
+        }).then(() => {
+            document.getElementById('sendGossip').disabled = false;
+            sendGossip = () => {
+                let msg = document.getElementById('message').value;
+                console.log("New Gossip message: ", msg);
+                window.webxdc.sendEphemeralUpdate(msg);
+            }
         });
-
-
-        function sendGossip() {
-            let msg = document.getElementById('message').value;
-            console.log(msg);
-            window.webxdc.sendEphemeralUpdate(msg);
-        }
 
         function sendMsg() {
             let msg = document.getElementById('message').value;
-            console.log(msg);
+            console.log("New SMTP message: ", msg);
 
             window.webxdc.sendUpdate({
                 payload: {
