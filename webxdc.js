@@ -23,6 +23,7 @@ window.webxdc = (() => {
       console.log("[Webxdc] " + JSON.stringify(update));
       updateListener(update);
     } else if (event.key === ephemeralUpdateKey) {
+      console.log("wat");
       var [sender, update] = JSON.parse(event.newValue);
       if (window.webxdc.selfAddr !== sender) {
         ephemeralUpdatListener(update);
@@ -83,10 +84,9 @@ window.webxdc = (() => {
       updateListener(_update);
     },
     sendEphemeralUpdate: (payload) => {
-      let updates = getEphemeralUpdate();
       window.localStorage.setItem(
         ephemeralUpdateKey,
-        JSON.stringify([window.webxdc.selfAddr, payload])
+        JSON.stringify([window.webxdc.selfAddr, payload, Date.now()]) // Date.now() is needed to trigger the event
       );
     },
     sendToChat: async (content) => {
