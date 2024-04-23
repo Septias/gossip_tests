@@ -10,7 +10,7 @@
 /** @type {import('./webxdc').Webxdc<any>} */
 window.webxdc = (() => {
   var updateListener = (_) => {};
-  var ephemeralUpdatListener = (_) => {};
+  var realtimeListener = (_) => {};
   var updatesKey = "__xdcUpdatesKey__";
   let ephemeralUpdateKey = "__xdcEphemeralUpdateKey__";
   window.addEventListener("storage", (event) => {
@@ -26,7 +26,7 @@ window.webxdc = (() => {
       console.log("wat");
       var [sender, update] = JSON.parse(event.newValue);
       if (window.webxdc.selfAddr !== sender) {
-        ephemeralUpdatListener(update);
+        realtimeListener(update);
       }
     }
   });
@@ -57,8 +57,8 @@ window.webxdc = (() => {
       updateListener = cb;
       return Promise.resolve();
     },
-    setEphemeralUpdateListener: (cb) => {
-      ephemeralUpdatListener = cb;
+    setRealtimeListener: (cb) => {
+      realtimeListener = cb;
       return Promise.resolve();
     },
     getAllUpdates: () => {
@@ -83,7 +83,7 @@ window.webxdc = (() => {
       );
       updateListener(_update);
     },
-    sendEphemeralUpdate: (payload) => {
+    sendRealtimeData: (payload) => {
       window.localStorage.setItem(
         ephemeralUpdateKey,
         JSON.stringify([window.webxdc.selfAddr, payload, Date.now()]) // Date.now() is needed to trigger the event

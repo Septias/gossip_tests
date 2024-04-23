@@ -50,7 +50,7 @@
         }
 
         input::placeholder {
-            color:#ddbdbb;
+            color: #ddbdbb;
         }
 
         #output {
@@ -87,7 +87,7 @@
         <div class="ui">
             <label style="margin-bottom: 2px"> Message </label>
             <input id="message" placeholder="message" style="margin-bottom: 1em"></input>
-            <button id="sendGossip" onclick="sendGossip()" style="margin-bottom: 0.5em" disabled="true"> Send GOSSIP
+            <button id="sendGossip" onclick="sendGossip()" style="margin-bottom: 0.5em"> Send GOSSIP
             </button>
             <button onclick="sendMsg()" style="margin-bottom: 0.5em"> Send SMTP </button>
 
@@ -111,26 +111,23 @@
             output.appendChild(El('span', "SMTP(" + window.webxdc.selfAddr + "): " + update.payload.msg));
         });
 
-        let sendGossip = () => { console.log("not ready") }
+        let sendGossip = () => {
+            let msg = document.getElementById('message').value;
+            console.log("New Gossip message: ", msg);
+            window.webxdc.sendRealtimeData(msg);
+        }
 
-        window.webxdc.setEphemeralUpdateListener(function (update) {
+        window.webxdc.setRealtimeListener(function (update) {
             console.log("Received Gossip: ", update);
             var output = document.getElementById('output');
             output.appendChild(El('span', "GOSSIP(" + window.webxdc.selfAddr + "): " + update));
-        }).then(() => {
-            document.getElementById('sendGossip').disabled = false;
-            sendGossip = () => {
-                let msg = document.getElementById('message').value;
-                console.log("New Gossip message: ", msg);
-                window.webxdc.sendEphemeralUpdate(msg);
-            }
-        });
+        })
 
         function sendMsg() {
             let msg = document.getElementById('message').value;
             console.log("New SMTP message: ", msg);
 
-            window.webxdc.sendUpdate({
+            window.webxdc.sendRealtimeData({
                 payload: {
                     name: window.webxdc.selfName,
                     msg,
