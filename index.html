@@ -99,35 +99,38 @@
 
     <script>
 
+        let webxdc = window.webxdc;
+
         var El = function (tag, text) {
             var el = document.createElement(tag);
             el.innerText = text || '';
             return el;
         };
 
+        const realtimeChannel = window.webxdc.joinRealtimeChannel();
+        realtimeChannel.setListener((data) => {
+            console.log("Received Gossip: ", data);
+            var output = document.getElementById('output');
+            output.appendChild(El('span', "GOSSIP: " + data));
+        })
+
         window.webxdc.setUpdateListener(function (update) {
             console.log("Received SMTP: ", update.payload);
             var output = document.getElementById('output');
-            output.appendChild(El('span', "SMTP(" + window.webxdc.selfAddr + "): " + update.payload.msg));
+            output.appendChild(El('span', "SMTP(" + update.payload.name + "): " + update.payload.msg));
         });
 
-        let sendGossip = () => {
+        function sendGossip() {
             let msg = document.getElementById('message').value;
             console.log("New Gossip message: ", msg);
-            window.webxdc.sendRealtimeData(msg);
+            realtimeChannel.send(msg);
         }
-
-        window.webxdc.setRealtimeListener(function (update) {
-            console.log("Received Gossip: ", update);
-            var output = document.getElementById('output');
-            output.appendChild(El('span', "GOSSIP(" + window.webxdc.selfAddr + "): " + update));
-        })
 
         function sendMsg() {
             let msg = document.getElementById('message').value;
             console.log("New SMTP message: ", msg);
 
-            window.webxdc.sendRealtimeData({
+            window.webxdc.sendUpdate({
                 payload: {
                     name: window.webxdc.selfName,
                     msg,

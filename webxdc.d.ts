@@ -60,6 +60,25 @@ type SendOptions =
       text: string;
     };
 
+/**
+ * A listener for realtime data.
+ */
+export class RealtimeListener {
+  private listener: (data: Uint8Array) => void
+  private trashed: boolean
+
+  /* Whether the realtime channel was left */
+  is_trashed(): boolean
+  /* Receive data from the realtime channel */
+  receive(data: Uint8Array): void
+  /* Set a listener for the realtime channel */
+  setListener(listener: (data: Uint8Array) => void): void
+  /* Send data over the realtime channel */
+  send(data: Uint8Array): void
+  /* Leave the realtime channel */
+  leave(): void
+}
+
 interface Webxdc<StatusPayload> {
   /** Returns the peer's own address.
    *  This is esp. useful if you want to differ between different peers - just send the address along with the payload,
@@ -79,9 +98,9 @@ interface Webxdc<StatusPayload> {
   ): Promise<void>;
 
   /**
-   * Set a listener for realtime data.
+   * Join a realtime channel.
    */
-  setEphemeralUpdateListener(cb: (payload: Uint8Array) => void): void;
+  joinRealtimeChannel(): RealtimeListener;
 
   /**
    * @deprecated See {@link setUpdateListener|`setUpdateListener()`}.
@@ -92,10 +111,7 @@ interface Webxdc<StatusPayload> {
    * @param update status update to send
    * @param description short, human-readable description what this update is about. this is shown eg. as a fallback text in an email program.
    */
-  sendUpdate(
-    update: SendingStatusUpdate<StatusPayload>,
-    description: string
-  ): void;
+  sendUpdate(update: SendingStatusUpdate<StatusPayload>, description: string): void;
 
   /**
    * Send realtime data.
