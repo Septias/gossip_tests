@@ -39,7 +39,7 @@ class RealtimeListener {
     }
     window.localStorage.setItem(
       ephemeralUpdateKey,
-      JSON.stringify([window.webxdc.selfAddr, data, Date.now()]) // Date.now() is needed to trigger the event
+      JSON.stringify([window.webxdc.selfAddr, Array.from(data), Date.now()]) // Date.now() is needed to trigger the event
     );
   }
 
@@ -68,10 +68,9 @@ window.webxdc = (() => {
       console.log("[Webxdc] " + JSON.stringify(update));
       updateListener(update);
     } else if (event.key === ephemeralUpdateKey) {
-      console.log("wat");
       var [sender, update] = JSON.parse(event.newValue);
       if (window.webxdc.selfAddr !== sender && realtimeListener && !realtimeListener.is_trashed()) {
-        realtimeListener.receive(update);
+        realtimeListener.receive( Uint8Array.from(update));
       }
     }
   });

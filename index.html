@@ -108,10 +108,12 @@
         };
 
         const realtimeChannel = window.webxdc.joinRealtimeChannel();
+        let enc = new TextEncoder()
+        let dec = new TextDecoder()
         realtimeChannel.setListener((data) => {
             console.log("Received Gossip: ", data);
             var output = document.getElementById('output');
-            output.appendChild(El('span', "GOSSIP: " + data));
+            output.appendChild(El('span', "GOSSIP: " + dec.decode(data)));
         })
 
         window.webxdc.setUpdateListener(function (update) {
@@ -122,8 +124,8 @@
 
         function sendGossip() {
             let msg = document.getElementById('message').value;
-            console.log("New Gossip message: ", msg);
-            realtimeChannel.send(msg);
+            console.log("New Gossip message: ", enc.encode(msg));
+            realtimeChannel.send(enc.encode(msg));
         }
 
         function sendMsg() {
