@@ -50,7 +50,7 @@
         }
 
         input::placeholder {
-            color: #ddbdbb;
+            color: #847979;
         }
 
         #output {
@@ -60,6 +60,8 @@
             min-height: 300px;
             border-radius: 0.5em;
             padding: 0.5em;
+            overflow: auto;
+            max-height: 35vh;
         }
 
         button {
@@ -86,13 +88,16 @@
     <div class="wrapper">
         <div class="ui">
             <label style="margin-bottom: 2px"> Message </label>
-            <input id="message" placeholder="message" style="margin-bottom: 1em"></input>
+            <input id="message" placeholder="Message" style="margin-bottom: 1em"></input>
             <button id="sendGossip" onclick="sendGossip()" style="margin-bottom: 0.5em"> Send GOSSIP
             </button>
             <button onclick="sendMsg()" style="margin-bottom: 0.5em"> Send SMTP </button>
-
             <h1> Output </h1>
-            <div id="output"></div>
+            <div>
+
+                <div id="output"></div>
+            </div>
+            <button onclick="leave()" style="margin-top: 0.5em; background: #BEA8A7;"> Leave GOSSIP </button>
         </div>
     </div>
 
@@ -138,6 +143,10 @@
                     msg,
                 },
             }, "");
+        }
+
+        function leave() {
+            realtimeChannel.leave()
         }
     </script>
 </body>
